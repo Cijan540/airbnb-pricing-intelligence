@@ -1,0 +1,21 @@
+# Raw data files — too large for GitHub and publicly available from Inside Airbnb
+data/raw/calendar.csv
+data/raw/reviews.csv
+data/raw/listings.csv
+
+# Processed data
+data/processed/*.csv
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# VS Code settings
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
