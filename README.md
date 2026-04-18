@@ -1,7 +1,7 @@
 # Austin Airbnb Pricing Intelligence
 ### What should a new Airbnb host in Austin charge per night to maximize revenue?
 
-**Project ID:** AUS-AIR-01 | **Status:** In Progress | **Phase:** Notebook 2 of 5
+**Project ID:** AUS-AIR-01 | **Status:** In Progress | **Phase:** Notebook 5 of 5
 
 ---
 
@@ -13,7 +13,7 @@ A new Airbnb host in Austin, Texas has no structured way to determine:
 - What amenities drive price premiums
 - What review score threshold keeps a listing competitive
 
-This project delivers a full pricing intelligence analysis of the Austin
+This project delivers a complete pricing intelligence analysis of the Austin
 Airbnb market using real scraped data from Inside Airbnb — not a cleaned
 Kaggle dataset. Every step is documented, version-controlled, and presented
 as a professional data analyst engagement.
@@ -21,6 +21,14 @@ as a professional data analyst engagement.
 ---
 
 ## Project Structure
+
+| Notebook | Focus | Status |
+|---|---|---|
+| 1 | Data cleaning and feature engineering | ✅ Complete |
+| 2 | SQL business analysis (10 queries) | ✅ Complete |
+| 3 | EDA and IBCS visualization (10 charts) | ✅ Complete |
+| 4 | Linear regression pricing model | ✅ Complete |
+| 5 | Geographic map | 🔄 In Progress |
 
 ---
 
@@ -44,48 +52,79 @@ Real scraped market data. Not a Kaggle dataset.
 | Language | Python 3.10+ |
 | Notebook | Jupyter via VS Code |
 | Data wrangling | Pandas, NumPy |
-| ML imputation | Scikit-learn (KNN, Random Forest) |
+| ML | Scikit-learn (KNN, Random Forest, Linear Regression) |
+| Statistical analysis | Statsmodels (VIF, p-values) |
 | Database | SQLite |
-| Visualization | Matplotlib, Seaborn, Folium |
+| Visualization | Matplotlib, Seaborn (IBCS standards) |
+| Mapping | Folium |
 | Dashboard | Tableau Public |
 | Version control | GitHub |
 
 ---
 
-## Notebook 1 — Data Cleaning ✅
+## Key Findings
 
-**What was done:**
+### The Austin Market
 
-Starting point: 10,533 raw listings × 79 columns
-Final output: 10,402 clean listings × 54 columns — saved to `data/processed/listings_clean.csv`
+- **10,402 entire home listings** after cleaning and outlier removal
+- **Median price: $144/night** — mean overstates market by 54%
+- **Entire homes dominate** — 86.6% of listings, 97.1% of revenue
+- **52.5% superhost rate** — mature competitive market
+- **14.9% of listings are new** with no reviews yet
 
-**Key decisions made:**
+### What Drives Price (From the Model)
 
-| Decision | Detail |
+| Driver | Impact | Interpretation |
+|---|---|---|
+| Bathrooms | +25% per bathroom | Strongest single predictor |
+| Accommodates | +4% per guest | Property capacity matters |
+| Bedrooms | +8% per bedroom | Still meaningful |
+| Hot tub | +$39/night | #1 amenity (controlled) |
+| Pool | +$34/night | Strong premium |
+| BBQ grill | +$23/night | Austin outdoor signal |
+| Superhost | -$14/night | Volume strategy, not premium |
+
+### Where to List — Tier 1 Neighborhoods
+
+| Neighborhood | Avg Price | Annual Revenue | Occupancy |
+|---|---|---|---|
+| 78736 | $237 | $29,600 | 111.7 nights |
+| 78732 | $392 | $25,089 | 93.7 nights |
+| 78702 | $242 | $22,376 | 112.2 nights |
+| 78729 | $188 | $19,393 | 108.0 nights |
+
+### The Optimal Host Strategy
+
+**For a new Austin host targeting maximum revenue:**
+
+| Decision | Recommendation |
 |---|---|
-| Column reduction | Dropped 42 columns — URLs, 100% nulls, redundant |
-| Price cleaning | Stripped `$` and `,` — converted to float64 |
-| Outlier removal | Capped at 99th percentile ($2,431) — removed 122 listings |
-| KNN imputation | k=5 — filled nulls in response rate, acceptance rate, bedrooms, bathrooms, beds |
-| Superhost prediction | Random Forest — predicted 399 unknown labels — 72.2% accuracy |
-| Review score nulls | Filled with median — new listings with no reviews yet |
-| Feature engineering | 18 new columns — amenities, price per bedroom, new listing flag |
-
-**Key market findings so far:**
-
-- Median Austin price: **$134/night**
-- Average host experience: **8.5 years** — mature, competitive market
-- Superhost rate: **52.5%** of listings
-- WiFi penetration: **99.3%** — table stakes, not a differentiator
-- Pool penetration: **36.1%** — higher than expected
-- BBQ penetration: **42.6%** — Austin outdoor culture confirmed
-- New listings: **14.9%** of the market have no reviews yet
+| Neighborhood | 78702 or 78704 |
+| Property size | 4-5 bedrooms |
+| Must-have amenities | Pool + BBQ |
+| Aspirational | Hot tub |
+| Entry price | 15% below neighborhood market average |
+| Year one target | Superhost status |
+| Expected year one | $6K–$12K revenue |
+| Post-superhost | $22K+ annual revenue |
 
 ---
 
-## Notebook 2 — SQL Business Analysis 🔄
+## The Pricing Model
 
-*In progress — 10 business queries answering the core pricing question*
+Linear regression on 72 features after multicollinearity analysis.
+
+| Metric | Value |
+|---|---|
+| R² (test) | 0.605 |
+| MAE (test) | $85 |
+| Training rows | 7,210 |
+| Test rows | 1,803 |
+| Features | 72 (after VIF reduction from 106) |
+
+**Honest limitations:** The model underpredicts luxury properties by 40%+ —
+linear regression is not the right tool for the premium tier.
+For budget and mid-market properties the model is accurate within 20-30%.
 
 ---
 
@@ -94,20 +133,35 @@ Final output: 10,402 clean listings × 54 columns — saved to `data/processed/l
 | Path | Contents |
 |---|---|
 | `data/raw/` | Original unmodified CSV files from Inside Airbnb |
-| `data/processed/` | Clean, feature-engineered datasets |
+| `data/processed/` | Clean datasets (listings_clean.csv, airbnb_austin.db) |
 | `notebooks/` | Jupyter notebooks — one per analysis phase |
 | `sql/queries.sql` | All 10 SQL queries as a standalone file |
-| `outputs/figures/` | All charts exported as PNG |
+| `outputs/figures/` | 12 IBCS charts exported as PNG |
 | `docs/` | Project charter and data dictionary |
 
 ---
 
-## Documents
+## Documentation
 
-- [Project Charter](docs/project_charter.docx)
-- [Data Dictionary](docs/data_dictionary.md)
+- [Data Dictionary](docs/data_dictionary.md) — every cleaning decision logged
+- [SQL Queries](sql/queries.sql) — all 10 queries with business context
+- [Figures](outputs/figures/) — 12 IBCS-compliant visualizations
 
 ---
 
-*This project is part of a data analyst portfolio.
-Built with real public data. Every decision documented.*
+## Methodology Highlights
+
+- **ML imputation** — KNN and Random Forest for missing data recovery
+- **IBCS visualization** — International Business Communication Standards applied to every chart
+- **Feature engineering** — 18 new columns including amenity binaries and derived ratios
+- **VIF multicollinearity analysis** — identified and eliminated severe collinearity in 16 features
+- **Log transformation** — addressed right-skew in price distribution
+- **Incremental modeling** — built 5 models sequentially to measure each feature block's contribution
+- **Standardized coefficients** — fair comparison across features of different scales
+
+---
+
+*Built by Cizen Bhatta*
+*Analyst Portfolio Project*
+*Dataset: [insideairbnb.com](https://insideairbnb.com/get-the-data/) — Austin, Texas*
+*Tools: Python · SQL · Tableau · GitHub*
